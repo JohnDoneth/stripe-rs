@@ -1,5 +1,6 @@
 use stripe::{Customer, ListCustomers, RangeBounds, RangeQuery};
 
+/*
 fn main() {
     // Create a new client
     let secret_key = std::env::var("STRIPE_SECRET_KEY").expect("Missing STRIPE_SECRET_KEY in env");
@@ -44,3 +45,4 @@ fn main() {
     // Print all customers create in the time range
     println!("{:?}", customers3);
 }
+*/

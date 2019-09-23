@@ -4,7 +4,6 @@ use crate::params::Headers;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::RequestBuilder;
 use serde::de::DeserializeOwned;
-use std::io::Read;
 
 #[derive(Clone)]
 pub struct Client {
@@ -51,50 +50,50 @@ impl Client {
     }
 
     /// Make a `GET` http request with just a path
-    pub fn get<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
+    pub async fn get<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
         let url = self.url(path);
         let request = self.client.get(&url).headers(self.headers());
-        send(request)
+        send(request).await
     }
 
     /// Make a `GET` http request with url query parameters
-    pub fn get_query<T: DeserializeOwned, P: serde::Serialize>(
+    pub async fn get_query<T: DeserializeOwned, P: serde::Serialize>(
         &self,
         path: &str,
         params: P,
     ) -> Response<T> {
         let url = self.url_with_params(path, params)?;
         let request = self.client.get(&url).headers(self.headers());
-        send(request)
+        send(request).await
     }
 
     /// Make a `DELETE` http request with just a path
-    pub fn delete<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
+    pub async fn delete<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
         let url = self.url(path);
         let request = self.client.delete(&url).headers(self.headers());
-        send(request)
+        send(request).await
     }
 
     /// Make a `DELETE` http request with url query parameters
-    pub fn delete_query<T: DeserializeOwned, P: serde::Serialize>(
+    pub async fn delete_query<T: DeserializeOwned, P: serde::Serialize>(
         &self,
         path: &str,
         params: P,
     ) -> Response<T> {
         let url = self.url_with_params(path, params)?;
         let request = self.client.delete(&url).headers(self.headers());
-        send(request)
+        send(request).await
     }
 
     /// Make a `POST` http request with just a path
-    pub fn post<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
+    pub async fn post<T: DeserializeOwned>(&self, path: &str) -> Response<T> {
         let url = self.url(path);
         let request = self.client.post(&url).headers(self.headers());
-        send(request)
+        send(request).await
     }
 
     /// Make a `POST` http request with urlencoded body
-    pub fn post_form<T: DeserializeOwned, F: serde::Serialize>(
+    pub async fn post_form<T: DeserializeOwned, F: serde::Serialize>(
         &self,
         path: &str,
         form: F,
@@ -102,7 +101,7 @@ impl Client {
         let url = self.url(path);
         let request = self.client.post(&url).headers(self.headers());
         let request = with_form_urlencoded(request, &form)?;
-        send(request)
+        send(request).await
     }
 
     fn url(&self, path: &str) -> String {
@@ -155,8 +154,8 @@ fn with_form_urlencoded<T: serde::Serialize>(
         .body(body))
 }
 
-fn send<T: DeserializeOwned>(request: RequestBuilder) -> Response<T> {
-    let mut response = request.send()?;
+async fn send<T: DeserializeOwned>(request: RequestBuilder) -> Response<T> {
+    let mut response = request.send().await;
     let mut body = String::with_capacity(4096);
     response.read_to_string(&mut body)?;
 

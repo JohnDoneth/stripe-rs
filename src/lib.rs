@@ -57,23 +57,12 @@
 #![allow(clippy::needless_pass_by_value)]
 #![allow(clippy::large_enum_variant)]
 
-#[cfg(not(feature = "async"))]
 mod client;
 mod error;
 mod ids;
 mod params;
 mod resources;
 
-// N.B. Ideally we would support both a blocking client and
-//      an async client without a feature flag, but the originally
-//      discussed solution requires Generic Associated Types--
-//      instead we provide an async client only a feature flag.
-//
-// See https://github.com/wyyerd/stripe-rs/issues/24#issuecomment-451514187
-// See https://github.com/rust-lang/rust/issues/44265
-#[cfg(feature = "async")]
-pub mod r#async;
-#[cfg(not(feature = "async"))]
 pub use crate::client::Client;
 pub use crate::error::{Error, ErrorCode, ErrorType, RequestError, WebhookError};
 pub use crate::ids::*;
@@ -82,7 +71,7 @@ pub use crate::params::{
 };
 pub use crate::resources::*;
 
-#[cfg(not(feature = "async"))]
+/*#[cfg(not(feature = "async"))]
 mod config {
     use crate::error::Error;
 
@@ -110,27 +99,28 @@ mod config {
     pub fn err<T>(err: Error) -> Response<T> {
         Err(err)
     }
-}
+}*/
 
-#[cfg(feature = "async")]
+
 mod config {
     use crate::error::Error;
-    use futures::future::{self, Future};
+    
+    use std::future::Future;
+    use futures_util::future;
+    
+    pub type Response<T> = Result<T, Error>;
+    //pub type Response<T> = Box<dyn Future<Output = ResponseResult<T>> + Send>;
 
-    // TODO: We'd rather use `impl Future<Result<T, Error>>` but that isn't so
-    //       easy to accomplish in generic code with futures 0.1.x
-    pub type Response<T> = Box<dyn Future<Item = T, Error = Error> + Send>;
-
-    pub(crate) type Client = crate::r#async::Client;
+    pub(crate) type Client = crate::client::Client;
 
     #[inline]
     pub(crate) fn ok<T: Send + 'static>(ok: T) -> Response<T> {
-        Box::new(future::ok(ok))
+        Box::new(future::ready(Ok(ok)))
     }
 
     #[inline]
     pub(crate) fn err<T: Send + 'static>(err: Error) -> Response<T> {
-        Box::new(future::err(err))
+        Box::new(future::ready(Err(err)))
     }
 }
 

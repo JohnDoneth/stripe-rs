@@ -185,7 +185,8 @@ impl<T: Paginate + DeserializeOwned + Send + 'static> List<T> {
     /// Not supported by `stripe::async::Client`.
     #[cfg(not(feature = "async"))]
     pub fn get_all(self, client: &Client) -> Response<Vec<T>> {
-        let mut data = Vec::new();
+        unimplemented!()
+        /*let mut data = Vec::new();
         let mut next = self;
         loop {
             if next.has_more {
@@ -197,7 +198,7 @@ impl<T: Paginate + DeserializeOwned + Send + 'static> List<T> {
                 break;
             }
         }
-        Ok(data)
+        Ok(data)*/
     }
 
     /// Fetch an additional page of data from stripe.

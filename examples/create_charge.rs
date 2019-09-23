@@ -1,3 +1,5 @@
+
+/*
 fn main() {
     // Create a new client
     let secret_key = std::env::var("STRIPE_SECRET_KEY").expect("Missing STRIPE_SECRET_KEY in env");
@@ -26,3 +28,4 @@ fn main() {
         charge.id, charge.amount, charge.created, charge.status
     );
 }
+*/
