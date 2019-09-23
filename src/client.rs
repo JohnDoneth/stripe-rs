@@ -155,7 +155,7 @@ fn with_form_urlencoded<T: serde::Serialize>(
 }
 
 async fn send<T: DeserializeOwned>(request: RequestBuilder) -> Response<T> {
-    let mut response = request.send().await;
+    let mut response = request.send().await?;
     let mut body = String::with_capacity(4096);
     response.read_to_string(&mut body)?;
 

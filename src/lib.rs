@@ -115,12 +115,12 @@ mod config {
 
     #[inline]
     pub(crate) fn ok<T: Send + 'static>(ok: T) -> Response<T> {
-        Box::new(future::ready(Ok(ok)))
+        Ok(ok)
     }
 
     #[inline]
     pub(crate) fn err<T: Send + 'static>(err: Error) -> Response<T> {
-        Box::new(future::ready(Err(err)))
+        Err(err)
     }
 }
 
